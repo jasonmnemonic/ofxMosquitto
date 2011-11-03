@@ -9,8 +9,8 @@
 
 #include "ofxMosquitto.h"
 
-ofxMosquitto::ofxMosquitto()
-: mosquittopp::mosquittopp("msq")
+ofxMosquitto::ofxMosquitto(string id)
+: mosquittopp::mosquittopp(id.c_str())
 {
 	lib_init();
 	subscriber = NULL;
@@ -25,6 +25,7 @@ void ofxMosquitto::setSubscriber(ofxMosquittoSubscriber* sub){
 }
 
 void ofxMosquitto::setup(string host, int port, int keepalive){
+	ofLogVerbose("ofxMosquitto -- connecting to " + host + " on port " + ofToString(port) );
 	connect(host.c_str(), port, keepalive);
 }
 
@@ -41,14 +42,36 @@ void ofxMosquitto::setup(string host, int port, int keepalive){
 void ofxMosquitto::update(){
 	int ret = loop();
 	if(ret != MOSQ_ERR_SUCCESS){
-		ofLogError("MOSQ Error!");
+		switch (ret) {
+			case MOSQ_ERR_INVAL:
+				ofLogError("ofxMosquitto -- MOSQ_ERR_INVAL - the input parameters were invalid.");
+				break;
+			case MOSQ_ERR_NOMEM:
+				ofLogError("ofxMosquitto -- MOSQ_ERR_NOMEM - an out of memory condition occurred.");
+				break;
+			case MOSQ_ERR_NO_CONN:
+				ofLogError("ofxMosquitto -- MOSQ_ERR_NO_CONN - the client isn't connected to a broker.");
+				break;
+			case MOSQ_ERR_CONN_LOST:
+				ofLogError("ofxMosquitto -- MOSQ_ERR_CONN_LOST - the connection to the broker was lost.");
+				break;
+			case MOSQ_ERR_PROTOCOL:
+				ofLogError("ofxMosquitto -- MOSQ_ERR_PROTOCOL - there is a protocol error communicating with the broker.");
+				break;
+			default:
+				ofLogError("ofxMosquitto -- Unknown error");
+				break;
+		}
 	}
-	
-	ret = loop_write();
+	//ret = loop_write();
+}
+
+void ofxMosquitto::subscribe(uint16_t* messageId, string topic, ofxMosquittoQoS qualityOfService) {
+	mosquittopp::mosquittopp::subscribe(messageId, topic.c_str(), (int)qualityOfService);
 }
 
 void ofxMosquitto::subscribe(string topic, ofxMosquittoQoS qualityOfService){
-	mosquittopp::mosquittopp::subscribe(NULL, topic.c_str(), (int)qualityOfService);
+	subscribe(NULL, topic, qualityOfService);
 }
 
 void ofxMosquitto::unsubscribe(string topic){
@@ -64,7 +87,7 @@ void ofxMosquitto::publish(string topic, uint32_t payloadlen, const uint8_t* pay
 }
 
 void ofxMosquitto::on_connect(int rc){
-
+	ofLogNotice("ofxMosquitto -- connected successfully");	
 }
 
 void ofxMosquitto::on_disconnect(){

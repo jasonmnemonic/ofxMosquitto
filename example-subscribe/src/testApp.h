@@ -22,6 +22,7 @@ class testApp : public ofBaseApp, public ofxMosquittoSubscriber {
 	
 		void receivedMessage(const struct mosquitto_message* message);
 		
-		ofxMosquitto mosquitto;
-	
+		ofxMosquitto* mosquitto;
+		bool receivedMouse;
+		ofPoint lastMouse;
 };

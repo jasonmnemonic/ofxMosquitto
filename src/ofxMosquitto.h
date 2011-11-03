@@ -25,7 +25,7 @@ class ofxMosquittoSubscriber {
 
 class ofxMosquitto : public mosquittopp::mosquittopp {
   public:
-	ofxMosquitto();
+	ofxMosquitto(string id);
 	~ofxMosquitto();
 	
 	void setSubscriber(ofxMosquittoSubscriber* subscriber);
@@ -33,6 +33,7 @@ class ofxMosquitto : public mosquittopp::mosquittopp {
 	void setup(string host="localhost", int port=1883, int keepalive=60);
 	void update();
 	
+	void subscribe(uint16_t* messageId, string topic, ofxMosquittoQoS qualityOfService = OF_MOSQ_QOS_0_DONT_CARE);
 	void subscribe(string topic, ofxMosquittoQoS qualityOfService = OF_MOSQ_QOS_0_DONT_CARE);
 	void unsubscribe(string topic);
 	
