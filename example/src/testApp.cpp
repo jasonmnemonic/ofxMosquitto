@@ -3,7 +3,11 @@
 //--------------------------------------------------------------
 void testApp::setup(){
 	mosquitto.setup();
-
+	mosquitto.setSubscriber(this);
+	
+	mosquitto.subscribe("/+/mouse/#");
+	
+	ofSetLogLevel(OF_LOG_NOTICE);
 }
 
 //--------------------------------------------------------------
@@ -14,6 +18,10 @@ void testApp::update(){
 //--------------------------------------------------------------
 void testApp::draw(){
 
+}
+
+void testApp::receivedMessage(const struct mosquitto_message* message){
+	ofLog(OF_LOG_NOTICE, "received topic: %s payload: %s ", message->topic, message->payload);
 }
 
 //--------------------------------------------------------------

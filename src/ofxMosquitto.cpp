@@ -13,10 +13,15 @@ ofxMosquitto::ofxMosquitto()
 : mosquittopp::mosquittopp("msq")
 {
 	lib_init();
+	subscriber = NULL;
 }
 
 ofxMosquitto::~ofxMosquitto(){
 	lib_cleanup();
+}
+
+void ofxMosquitto::setSubscriber(ofxMosquittoSubscriber* sub){
+	subscriber = sub;
 }
 
 void ofxMosquitto::setup(string host, int port, int keepalive){
@@ -42,6 +47,13 @@ void ofxMosquitto::update(){
 	ret = loop_write();
 }
 
+void ofxMosquitto::subscribe(string topic, ofxMosquittoQoS qualityOfService){
+	mosquittopp::mosquittopp::subscribe(NULL, topic.c_str(), (int)qualityOfService);
+}
+
+void ofxMosquitto::unsubscribe(string topic){
+	mosquittopp::mosquittopp::unsubscribe(NULL, topic.c_str());
+}
 
 void ofxMosquitto::publish(string topic, string message, ofxMosquittoQoS qualityOfService){
 	publish(topic, message.size(), (uint8_t*)(&message[0]), qualityOfService);
@@ -64,11 +76,18 @@ void ofxMosquitto::on_publish(uint16_t mid){
 }
 
 void ofxMosquitto::on_message(const struct mosquitto_message *message){
-	
+	if(subscriber != NULL){
+		if(message->payloadlen){
+			subscriber->receivedMessage(message);
+		}
+		else{
+			ofLogError("ofxMosquitto -- empty message received");
+		}
+	}
 }
 
 void ofxMosquitto::on_subscribe(uint16_t mid, int qos_count, const uint8_t *granted_qos){
-
+	ofLogNotice("ofxMosquitto -- Subscribed successfully");
 }
 
 void ofxMosquitto::on_unsubscribe(uint16_t mid){

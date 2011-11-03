@@ -17,18 +17,31 @@ enum ofxMosquittoQoS {
  	OF_MOSQ_QOS_2_MUST_SUCCEED	= 2,
 };
 
+class ofxMosquittoSubscriber { 
+  public:
+	virtual void receivedMessage(const struct mosquitto_message* message) = 0;
+	//TODO wrap other on_* functions
+};
 
 class ofxMosquitto : public mosquittopp::mosquittopp {
   public:
 	ofxMosquitto();
 	~ofxMosquitto();
 	
+	void setSubscriber(ofxMosquittoSubscriber* subscriber);
+	
 	void setup(string host="localhost", int port=1883, int keepalive=60);
 	void update();
 	
+	void subscribe(string topic, ofxMosquittoQoS qualityOfService = OF_MOSQ_QOS_0_DONT_CARE);
+	void unsubscribe(string topic);
+	
 	void publish(string topic, string message, ofxMosquittoQoS qualityOfService = OF_MOSQ_QOS_0_DONT_CARE);
 	void publish(string topic, uint32_t payloadlen, const uint8_t* payload, ofxMosquittoQoS qualityOfService = OF_MOSQ_QOS_0_DONT_CARE);
-
+	
+  protected:
+	ofxMosquittoSubscriber* subscriber;
+	
 	void on_connect(int rc);
 	void on_disconnect();
 	void on_publish(uint16_t mid);
@@ -37,6 +50,6 @@ class ofxMosquitto : public mosquittopp::mosquittopp {
 	void on_unsubscribe(uint16_t mid);
 	void on_error();
 	
-  protected:
-	
+		
 };
+
