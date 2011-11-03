@@ -12,9 +12,9 @@
 #include "mosquittopp.h"
 
 enum ofxMosquittoQoS {
-	OF_MOSQ_QOS_0_DONT_CARE = 0,
- 	OF_MOSQ_QOS_1_TELL_ME	= 1,
- 	OF_MOSQ_QOS_2_MUST_SUCCEED	= 2,
+	OF_MOSQ_QOS_0 = 0,
+ 	OF_MOSQ_QOS_1	= 1,
+ 	OF_MOSQ_QOS_2	= 2,
 };
 
 class ofxMosquittoSubscriber { 
@@ -33,12 +33,12 @@ class ofxMosquitto : public mosquittopp::mosquittopp {
 	void setup(string host="localhost", int port=1883, int keepalive=60);
 	void update();
 	
-	void subscribe(uint16_t* messageId, string topic, ofxMosquittoQoS qualityOfService = OF_MOSQ_QOS_0_DONT_CARE);
-	void subscribe(string topic, ofxMosquittoQoS qualityOfService = OF_MOSQ_QOS_0_DONT_CARE);
+	void subscribe(uint16_t* messageId, string topic, ofxMosquittoQoS qualityOfService = OF_MOSQ_QOS_1);
+	void subscribe(string topic, ofxMosquittoQoS qualityOfService = OF_MOSQ_QOS_1);
 	void unsubscribe(string topic);
 	
-	void publish(string topic, string message, ofxMosquittoQoS qualityOfService = OF_MOSQ_QOS_0_DONT_CARE);
-	void publish(string topic, uint32_t payloadlen, const uint8_t* payload, ofxMosquittoQoS qualityOfService = OF_MOSQ_QOS_0_DONT_CARE);
+	void publish(string topic, string message, ofxMosquittoQoS qualityOfService = OF_MOSQ_QOS_1);
+	void publish(string topic, uint32_t payloadlen, const uint8_t* payload, ofxMosquittoQoS qualityOfService = OF_MOSQ_QOS_1);
 	
   protected:
 	ofxMosquittoSubscriber* subscriber;

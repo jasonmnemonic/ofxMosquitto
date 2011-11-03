@@ -2,11 +2,12 @@
 
 //--------------------------------------------------------------
 void testApp::setup(){
+	ofSetFrameRate(30);
 	
 	mosquitto = new ofxMosquitto("exampleSubscriber");
 	mosquitto->setup();
 	mosquitto->setSubscriber(this);
-	mosquitto->subscribe("/+/mouse/#");
+	mosquitto->subscribe("/+/mouse/");
 	
 	receivedMouse = false;
 	
@@ -27,7 +28,7 @@ void testApp::draw(){
 }
 
 void testApp::receivedMessage(const struct mosquitto_message* message){
-	ofLog(OF_LOG_NOTICE, "received topic: %s");
+//	ofLog(OF_LOG_NOTICE, "received topic: %s", message->topic);
 	receivedMouse = true;
 	memcpy(&lastMouse[0], message->payload, sizeof(ofPoint));
 	
